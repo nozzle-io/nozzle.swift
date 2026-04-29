@@ -32,6 +32,34 @@ let package = Package(
                 .unsafeFlags(["-Ldeps/nozzle/build"]),
             ]
         ),
+        .executableTarget(
+            name: "SenderExample",
+            dependencies: ["Nozzle"],
+            path: "Sources/Binaries/SenderExample",
+            linkerSettings: [
+                .linkedLibrary("nozzle"),
+                .linkedLibrary("c++"),
+                .linkedFramework("Metal"),
+                .linkedFramework("IOSurface"),
+                .linkedFramework("Foundation"),
+                .linkedFramework("OpenGL"),
+                .unsafeFlags(["-Ldeps/nozzle/build"]),
+            ]
+        ),
+        .executableTarget(
+            name: "ReceiverExample",
+            dependencies: ["Nozzle"],
+            path: "Sources/Binaries/ReceiverExample",
+            linkerSettings: [
+                .linkedLibrary("nozzle"),
+                .linkedLibrary("c++"),
+                .linkedFramework("Metal"),
+                .linkedFramework("IOSurface"),
+                .linkedFramework("Foundation"),
+                .linkedFramework("OpenGL"),
+                .unsafeFlags(["-Ldeps/nozzle/build"]),
+            ]
+        ),
         .testTarget(
             name: "NozzleTests",
             dependencies: ["Nozzle"],

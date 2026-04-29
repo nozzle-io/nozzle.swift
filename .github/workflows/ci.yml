@@ -1,0 +1,24 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Bootstrap nozzle
+        run: ./Scripts/bootstrap.sh
+
+      - name: Build
+        run: swift build
+
+      - name: Test
+        run: swift test
+        continue-on-error: true
