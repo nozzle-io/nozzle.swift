@@ -14,10 +14,7 @@ let package = Package(
         .target(
             name: "CNozzle",
             path: "Sources/CNozzle",
-            publicHeadersPath: "include",
-            cSettings: [
-                .headerSearchPath("../../deps/nozzle/include"),
-            ]
+            publicHeadersPath: "include"
         ),
         .target(
             name: "Nozzle",

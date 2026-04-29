@@ -23,6 +23,10 @@ cmake -S "$NOZZLE_DIR" -B "$NOZZLE_DIR/build" \
 
 cmake --build "$NOZZLE_DIR/build" --config Release
 
+NOZZLE_INCLUDE_LINK="$PROJECT_DIR/Sources/CNozzle/include/nozzle"
+rm -rf "$NOZZLE_INCLUDE_LINK"
+ln -sf "$NOZZLE_DIR/include/nozzle" "$NOZZLE_INCLUDE_LINK"
+
 echo ""
 echo "Build complete."
 echo "  Library: $NOZZLE_DIR/build/libnozzle.a"
