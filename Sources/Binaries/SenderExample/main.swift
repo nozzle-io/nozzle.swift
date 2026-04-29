@@ -1,3 +1,4 @@
+import Foundation
 import Nozzle
 
 let sender = try Sender.create(name: "swift_sender", applicationName: "SwiftExample")
