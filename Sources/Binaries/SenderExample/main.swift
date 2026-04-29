@@ -33,7 +33,7 @@ for i in 0..<totalFrames {
         print("Frame \(i)/\(totalFrames)")
     }
 
-    Thread.sleep(for: 0.1)
+    Thread.sleep(forTimeInterval: 0.1)
 }
 
 print("Sender done")

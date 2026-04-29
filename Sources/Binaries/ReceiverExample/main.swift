@@ -31,7 +31,7 @@ for _ in 0..<iterations {
         print("Acquire error: \(error)")
     }
 
-    Thread.sleep(for: 0.033)
+    Thread.sleep(forTimeInterval: 0.033)
 }
 
 print("Receiver done (received \(received) frames)")
