@@ -1,3 +1,4 @@
+import Foundation
 import Nozzle
 
 let receiver = try Receiver.create(name: "swift_sender", applicationName: "SwiftViewer")
