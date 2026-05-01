@@ -1,5 +1,8 @@
 # Nozzle.swift
 
+> This codebase is currently in its AI-slob prototyping phase: the code runs on momentum, vibes, and plausible intent.
+> Proper debugging will be introduced once demand graduates from hypothetical to measurable.
+
 Idiomatic Swift wrapper for [nozzle](https://github.com/nozzle-io/nozzle) — a cross-platform C/C++17 static library for local inter-process GPU texture sharing.
 
 ## Requirements
@@ -183,3 +186,7 @@ The Swift wrapper calls exclusively through the C ABI (`nozzle_c.h`). The C++ AP
 ## License
 
 MIT
+
+Third-party dependencies:
+
+- [nozzle](https://github.com/nozzle-io/nozzle) — MIT
