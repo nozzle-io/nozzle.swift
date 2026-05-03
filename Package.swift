@@ -26,6 +26,7 @@ let package = Package(
                 .linkedFramework("IOSurface"),
                 .linkedFramework("Foundation"),
                 .linkedFramework("OpenGL"),
+                .linkedFramework("Accelerate"),
                 .unsafeFlags(["-Ldeps/nozzle/build"]),
             ]
         ),
@@ -40,6 +41,7 @@ let package = Package(
                 .linkedFramework("IOSurface"),
                 .linkedFramework("Foundation"),
                 .linkedFramework("OpenGL"),
+                .linkedFramework("Accelerate"),
                 .unsafeFlags(["-Ldeps/nozzle/build"]),
             ]
         ),
@@ -54,6 +56,7 @@ let package = Package(
                 .linkedFramework("IOSurface"),
                 .linkedFramework("Foundation"),
                 .linkedFramework("OpenGL"),
+                .linkedFramework("Accelerate"),
                 .unsafeFlags(["-Ldeps/nozzle/build"]),
             ]
         ),
@@ -67,6 +70,7 @@ let package = Package(
                 .linkedFramework("IOSurface"),
                 .linkedFramework("Foundation"),
                 .linkedFramework("OpenGL"),
+                .linkedFramework("Accelerate"),
                 .unsafeFlags(["-Ldeps/nozzle/build"]),
             ]
         ),
