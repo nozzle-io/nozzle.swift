@@ -65,4 +65,8 @@ public final class Sender {
         }
         try check(nozzle_sender_commit_frame(ptr, fptr))
     }
+
+    public func publishNativeTexture(_ nativeTexture: UnsafeMutableRawPointer, width: UInt32, height: UInt32, format: TextureFormat) throws {
+        try check(nozzle_sender_publish_native_texture(ptr, nativeTexture, width, height, format.cValue))
+    }
 }

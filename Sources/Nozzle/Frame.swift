@@ -47,6 +47,10 @@ public final class Frame {
         ptr = nil
         released = true
     }
+
+    public func copyToNativeTexture(_ nativeTexture: UnsafeMutableRawPointer, width: UInt32, height: UInt32, format: TextureFormat) throws {
+        try check(nozzle_frame_copy_to_native_texture(ptr, nativeTexture, width, height, format.cValue))
+    }
 }
 
 public final class MappedPixels {
