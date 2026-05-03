@@ -25,7 +25,7 @@ public final class Frame {
 
     public func lockPixels() throws -> MappedPixels {
         var cPixels = CNozzle.NozzleMappedPixels()
-        try check(nozzle_frame_lock_pixels(ptr, &cPixels))
+        try check(nozzle_frame_lock_pixels_with_origin(ptr, NOZZLE_ORIGIN_TOP_LEFT, &cPixels))
         guard cPixels.data != nil else {
             throw NozzleError.unknown
         }
@@ -34,7 +34,7 @@ public final class Frame {
 
     public func lockWritablePixels() throws -> MappedPixels {
         var cPixels = CNozzle.NozzleMappedPixels()
-        try check(nozzle_frame_lock_writable_pixels(ptr, &cPixels))
+        try check(nozzle_frame_lock_writable_pixels_with_origin(ptr, NOZZLE_ORIGIN_TOP_LEFT, &cPixels))
         guard cPixels.data != nil else {
             throw NozzleError.unknown
         }
@@ -68,7 +68,7 @@ public final class MappedPixels {
         self.framePtr = framePtr
         self.isWritable = isWritable
         self.data = pixels.data!
-        self.rowBytes = pixels.row_bytes
+        self.rowBytes = UInt32(pixels.row_stride_bytes)
         self.width = pixels.width
         self.height = pixels.height
         self.format = TextureFormat(pixels.format)
