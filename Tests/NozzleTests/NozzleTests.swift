@@ -149,7 +149,7 @@ final class IntegrationTests: XCTestCase {
         XCTAssertEqual(info.width, 256)
         XCTAssertEqual(info.height, 256)
         // Metal fallback: rgba8 → bgra8 for 8-bit IOSurface
-        XCTAssertNotEqual(info.format, .unknown)
+        XCTAssertTrue(info.format == .rgba8Unorm || info.format == .bgra8Unorm)
 
         try sender.commitFrame(frame)
     }
@@ -163,7 +163,7 @@ final class IntegrationTests: XCTestCase {
         XCTAssertEqual(pixels.width, 64)
         XCTAssertEqual(pixels.height, 64)
         // Metal fallback: rgba8 → bgra8 for 8-bit IOSurface
-        XCTAssertNotEqual(pixels.format, .unknown)
+        XCTAssertTrue(pixels.format == .rgba8Unorm || pixels.format == .bgra8Unorm)
         XCTAssertGreaterThan(pixels.rowBytes, 0)
         XCTAssertGreaterThan(pixels.byteCount, 0)
         XCTAssertNotNil(pixels.data)
@@ -184,6 +184,7 @@ final class IntegrationTests: XCTestCase {
         let receiver = try Receiver.create(name: senderName, applicationName: "NozzleTests-Receiver")
 
         let frame = try sender.acquireWritableFrame(width: 128, height: 128, format: .rgba8Unorm)
+        let senderFormat = frame.info.format
         try sender.commitFrame(frame)
 
         let receivedFrame = try receiver.acquireFrame(timeoutMs: 2000)
@@ -191,7 +192,8 @@ final class IntegrationTests: XCTestCase {
         XCTAssertEqual(info.width, 128)
         XCTAssertEqual(info.height, 128)
         // Metal fallback: rgba8 → bgra8 for 8-bit IOSurface
-        XCTAssertNotEqual(info.format, .unknown)
+        XCTAssertTrue(senderFormat == .rgba8Unorm || senderFormat == .bgra8Unorm)
+        XCTAssertEqual(info.format, senderFormat)
         XCTAssertEqual(info.frameIndex, 1)
     }
 }
