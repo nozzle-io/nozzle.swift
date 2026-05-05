@@ -169,7 +169,7 @@ try frame.copyToGLTexture(name: glTextureName, target: .texture2D, width: 1920, 
 
 ### Enums
 
-- **`TextureFormat`** — `unknown`, `r8Unorm`, `rgba8Unorm`, `bgra8Unorm`, `r16Float`, `r32Float`, `rgba32Float`, etc.
+- **`TextureFormat`** — all 18 nozzle formats: `r8Unorm`, `rg8Unorm`, `rgba8Unorm`, `bgra8Unorm`, `rgba8Srgb`, `bgra8Srgb`, `r16Unorm`, `rg16Unorm`, `rgba16Unorm`, `r16Float`, `rg16Float`, `rgba16Float`, `r32Float`, `rg32Float`, `rgba32Float`, `r32Uint`, `rgba32Uint`, `depth32Float` (plus `unknown`)
 - **`BackendType`** — `unknown`, `d3d11`, `metal`, `opengl`
 - **`ReceiveMode`** — `latestOnly`, `sequentialBestEffort`
 
