@@ -58,6 +58,7 @@ public struct ConnectedSenderInfo: Equatable {
     public var width: UInt32
     public var height: UInt32
     public var format: TextureFormat
+    public var semanticFormat: TextureFormat
     public var estimatedFps: Double
     public var frameCounter: UInt64
     public var lastUpdateTimeNs: UInt64
@@ -69,6 +70,7 @@ public struct FrameInfo: Equatable {
     public var width: UInt32
     public var height: UInt32
     public var format: TextureFormat
+    public var semanticFormat: TextureFormat
     public var droppedFrameCount: UInt32
 }
 
@@ -90,6 +92,7 @@ internal extension ConnectedSenderInfo {
         self.width = cValue.width
         self.height = cValue.height
         self.format = TextureFormat(cValue.format)
+        self.semanticFormat = TextureFormat(cValue.semantic_format)
         self.estimatedFps = cValue.estimated_fps
         self.frameCounter = cValue.frame_counter
         self.lastUpdateTimeNs = cValue.last_update_time_ns
@@ -103,6 +106,7 @@ internal extension FrameInfo {
         self.width = cValue.width
         self.height = cValue.height
         self.format = TextureFormat(cValue.format)
+        self.semanticFormat = TextureFormat(cValue.semantic_format)
         self.droppedFrameCount = cValue.dropped_frame_count
     }
 }
