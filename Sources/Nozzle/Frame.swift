@@ -18,7 +18,7 @@ public final class Frame {
         var cInfo = CNozzle.NozzleFrameInfo()
         let result = nozzle_frame_get_info(ptr, &cInfo)
         guard result.rawValue == 0 else {
-            return FrameInfo(frameIndex: 0, timestampNs: 0, width: 0, height: 0, format: .unknown, droppedFrameCount: 0)
+            return FrameInfo(frameIndex: 0, timestampNs: 0, width: 0, height: 0, format: .unknown, semanticFormat: .unknown, droppedFrameCount: 0)
         }
         return FrameInfo(cInfo)
     }
