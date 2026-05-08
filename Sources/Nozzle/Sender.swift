@@ -29,7 +29,8 @@ public final class Sender {
                 cDesc.name = namePtr
                 cDesc.application_name = appNamePtr
                 cDesc.ring_buffer_size = desc.ringBufferSize
-                cDesc.allow_format_fallback = desc.allowFormatFallback ? 1 : 0
+                cDesc.fallback_flags_valid = 1
+                cDesc.fallback_flags = desc.allowFormatFallback ? 3 : 0
 
                 try check(nozzle_sender_create(&cDesc, &senderPtr))
             }
