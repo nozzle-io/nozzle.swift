@@ -86,12 +86,14 @@ final class TypeTests: XCTestCase {
             width: 1920,
             height: 1080,
             format: .rgba8Unorm,
+            semanticFormat: .rgba8Unorm,
             droppedFrameCount: 2
         )
         XCTAssertEqual(info.frameIndex, 42)
         XCTAssertEqual(info.width, 1920)
         XCTAssertEqual(info.height, 1080)
         XCTAssertEqual(info.format, .rgba8Unorm)
+        XCTAssertEqual(info.semanticFormat, .rgba8Unorm)
         XCTAssertEqual(info.droppedFrameCount, 2)
     }
 
@@ -110,11 +112,14 @@ final class TypeTests: XCTestCase {
             width: 640,
             height: 480,
             format: .bgra8Unorm,
+            semanticFormat: .bgra8Unorm,
             estimatedFps: 60.0,
             frameCounter: 100,
             lastUpdateTimeNs: 5000
         )
         XCTAssertEqual(info.width, 640)
+        XCTAssertEqual(info.format, .bgra8Unorm)
+        XCTAssertEqual(info.semanticFormat, .bgra8Unorm)
         XCTAssertEqual(info.estimatedFps, 60.0)
         XCTAssertEqual(info.frameCounter, 100)
     }
