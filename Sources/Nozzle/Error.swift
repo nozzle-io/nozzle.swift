@@ -12,6 +12,7 @@ public enum NozzleError: Error, Equatable, CustomStringConvertible {
     case senderClosed
     case timeout
     case backendError
+    case commandFailed
 
     public var description: String {
         switch self {
@@ -26,6 +27,7 @@ public enum NozzleError: Error, Equatable, CustomStringConvertible {
         case .senderClosed: return "Sender closed"
         case .timeout: return "Timeout"
         case .backendError: return "Backend error"
+        case .commandFailed: return "Command execution failed"
         }
     }
 
@@ -42,6 +44,7 @@ public enum NozzleError: Error, Equatable, CustomStringConvertible {
         case 9:  self = .senderClosed
         case 10: self = .timeout
         case 11: self = .backendError
+        case 12: self = .commandFailed
         default: self = .unknown
         }
     }
