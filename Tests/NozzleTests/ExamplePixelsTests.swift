@@ -9,7 +9,7 @@ final class ExamplePixelsTests: XCTestCase {
         for width: UInt32 in [65, 641] {
             for requested: TextureFormat in [.rgba8Unorm, .bgra8Unorm] {
                 let name = "swift-example-\(UUID().uuidString)"
-                let sender = try Sender.create(name: name, applicationName: "example-test", allowFormatFallback: false)
+                let sender = try Sender.create(name: name, applicationName: "example-test")
                 defer { withExtendedLifetime(sender) {} }
                 XCTAssertEqual(sender.info.backend, .metal)
                 let receiver = try nativeReceiver(name)
@@ -159,7 +159,7 @@ final class ExamplePixelsTests: XCTestCase {
                 desc.application_name = application
                 desc.ring_buffer_size = 3
                 desc.fallback_flags_valid = 1
-                desc.fallback_flags = 0
+                desc.fallback_flags = UInt32(NOZZLE_FALLBACK_STORAGE_COMPATIBLE)
                 try check(nozzle_sender_create(&desc, &sender))
             }
         }
