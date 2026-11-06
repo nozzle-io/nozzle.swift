@@ -62,7 +62,7 @@ let package = Package(
         ),
         .testTarget(
             name: "NozzleTests",
-            dependencies: ["Nozzle"],
+            dependencies: ["Nozzle", "CNozzle"],
             linkerSettings: [
                 .linkedLibrary("nozzle"),
                 .linkedLibrary("c++"),
