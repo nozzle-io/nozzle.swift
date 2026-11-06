@@ -169,9 +169,32 @@ try frame.copyToGLTexture(name: glTextureName, target: .texture2D, width: 1920, 
 
 ### Enums
 
-- **`TextureFormat`** — all 18 nozzle formats: `r8Unorm`, `rg8Unorm`, `rgba8Unorm`, `bgra8Unorm`, `rgba8Srgb`, `bgra8Srgb`, `r16Unorm`, `rg16Unorm`, `rgba16Unorm`, `r16Float`, `rg16Float`, `rgba16Float`, `r32Float`, `rg32Float`, `rgba32Float`, `r32Uint`, `rgba32Uint`, `depth32Float` (plus `unknown`)
-- **`BackendType`** — `unknown`, `d3d11`, `metal`, `opengl`
+- **`TextureFormat`** — all 23 current nozzle formats: `r8Unorm`, `rg8Unorm`, `rgb8Unorm`, `rgba8Unorm`, `bgra8Unorm`, `rgba8Srgb`, `bgra8Srgb`, `r16Unorm`, `rg16Unorm`, `rgb16Unorm`, `rgba16Unorm`, `r16Float`, `rg16Float`, `rgb16Float`, `rgba16Float`, `r32Float`, `rg32Float`, `rgb32Float`, `rgba32Float`, `r32Uint`, `rgba32Uint`, `rgb32Uint`, `depth32Float` (plus `unknown`)
+- **`BackendType`** — `unknown`, `d3d11`, `metal`, `opengl`, `dmaBuf`
 - **`ReceiveMode`** — `latestOnly`, `sequentialBestEffort`
+
+These mappings use imported C constants, not duplicated integer ordinals.
+Representing a format/backend does not mean it is available on every platform;
+the package remains macOS-only. Unknown future C values map to `unknown`.
+
+### Enum compatibility correction
+
+The previous texture table was offset from core: for example, `.rgba8Unorm`
+sent `RGB8_UNORM` and native `BGRA8_UNORM` was read as `.rgba8Srgb`. The corrected
+mapping changes those erroneous runtime requests and labels. Remove any client
+workaround that intentionally selected the wrong Swift case to compensate.
+
+Existing case names remain, but adding the five RGB formats and `dmaBuf` can
+break exhaustive switches in source-based SwiftPM clients. Handle the new cases
+when updating; do not rely on Swift enum memory layout or ordinal values for
+persistence. This is a behavioral correction with possible source migration,
+not a guarantee of binary ABI compatibility. Core's C ABI and values are unchanged.
+
+`EnumContractTests` checks every represented texture/backend against the imported
+C constants in both directions, plus receive-mode output and unknown fallback.
+The old round-trip tests alone could not catch a table wrong in both directions.
+`FrameStatus` currently has no C conversion or use in the wrapper; this correction
+does not add an unused bridge for it. Enum checks are not all-format GPU tests.
 
 ## Architecture
 
