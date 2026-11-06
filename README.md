@@ -49,6 +49,11 @@ swift test
 
 ### Sender
 
+Mapped storage can differ from the requested format: on Metal an RGBA8 request
+can map as BGRA8. Inspect `pixels.format` **before** selecting channel offsets,
+element type, or bytes per pixel, and use `pixels.rowBytes` for row addresses.
+Do not assume byte 0 is red just because `.rgba8Unorm` was requested.
+
 ```swift
 import Nozzle
 
@@ -60,8 +65,9 @@ let frame = try sender.acquireWritableFrame(width: 1920, height: 1080, format: .
 
 // Access pixel data directly
 let pixels = try frame.lockWritablePixels()
+// Select layout from pixels.format, not the acquisition's requested format.
 let buffer = pixels.data.bindMemory(to: UInt8.self, capacity: pixels.byteCount)
-// ... write pixel data ...
+// ... write supported mapped pixel data using pixels.rowBytes ...
 pixels.unlock()
 
 // Commit the frame for receivers
@@ -69,6 +75,10 @@ try sender.commitFrame(frame)
 ```
 
 ### Receiver
+
+The same rule applies on receive: `pixels.format` describes the mapped bytes;
+frame/request metadata is not a substitute. Decode only layouts your code
+handles, and unlock without reading unsupported layouts.
 
 ```swift
 import Nozzle
@@ -88,6 +98,7 @@ print("Frame \(info.frameIndex): \(info.width)x\(info.height)")
 
 // Read pixel data
 let pixels = try frame.lockPixels()
+// Inspect pixels.format before interpreting the raw bytes.
 let buffer = pixels.data.bindMemory(to: UInt8.self, capacity: pixels.byteCount)
 // ... read pixel data ...
 pixels.unlock()
@@ -135,6 +146,7 @@ try frame.copyToGLTexture(name: glTextureName, target: .texture2D, width: 1920, 
 | `sender.info` | Get sender metadata |
 | `sender.acquireWritableFrame(width:height:format:)` | Acquire a frame for writing |
 | `sender.commitFrame(_ frame:)` | Publish a committed frame |
+| `sender.discardFrame(_ frame:)` | Return an unused writable frame's reserved slot without publishing |
 | `sender.publishGLTexture(name:target:width:height:format:)` | Publish an OpenGL texture |
 
 ### `Receiver`
@@ -164,7 +176,7 @@ try frame.copyToGLTexture(name: glTextureName, target: .texture2D, width: 1920, 
 | `rowBytes` | Bytes per row |
 | `width` | Width in pixels |
 | `height` | Height in pixels |
-| `format` | Pixel format |
+| `format` | Actual mapped storage format; may differ from the requested format |
 | `byteCount` | Total buffer size |
 
 ### Enums
@@ -198,6 +210,18 @@ does not add an unused bridge for it. Enum checks are not all-format GPU tests.
 
 ## Architecture
 
+`SenderExample` and `ReceiverExample` share an internal package target,
+`ExamplePixels`, with the example regression tests. It is not part of the
+`Nozzle` library product. These examples handle only `rgba8Unorm` and
+`bgra8Unorm`; they reject other layouts instead of treating floats, integers,
+or sRGB values as linear 8-bit RGBA. This is an example limitation, not removal
+of other texture formats from the wrapper.
+
+The tests compare the actual example functions with independent C API readers
+and writers on Metal, plus padded CPU fixtures for RGBA/BGRA and unsupported
+layouts. The native checks are in-process interoperability tests, not a
+cross-process or window-rendering smoke test.
+
 ```
 nozzle.swift (this package)
 ├── Sources/CNozzle/       C modulemap → deps/nozzle/include/nozzle/nozzle_c.h
@@ -213,6 +237,9 @@ The Swift wrapper calls exclusively through the C ABI (`nozzle_c.h`). The C++ AP
 - `Sender`, `Receiver`, `Frame`, `Device` — reference types with `deinit` that call the corresponding C destroy functions
 - `MappedPixels` — auto-unlocks on deinit; explicit `unlock()` available
 - `Frame.release()` — safe to call multiple times (no-op after first release)
+- Unlock a writable mapping before committing or discarding its frame.
+  Releasing the frame wrapper alone does not return a reserved sender slot.
+  The sender example calls `discardFrame` when it rejects a mapped layout.
 
 ## License
 

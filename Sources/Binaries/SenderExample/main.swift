@@ -1,5 +1,6 @@
 import Foundation
 import Nozzle
+import ExamplePixels
 
 let sender = try Sender.create(name: "swift_sender", applicationName: "SwiftExample")
 print("Sender created: \(sender.info.name)")
@@ -12,21 +13,13 @@ for i in 0..<totalFrames {
     let frame = try sender.acquireWritableFrame(width: width, height: height, format: .rgba8Unorm)
     let pixels = try frame.lockWritablePixels()
 
-    let buffer = pixels.data.bindMemory(to: UInt8.self, capacity: pixels.byteCount)
-    for y in 0..<Int(pixels.height) {
-        for x in 0..<Int(pixels.width) {
-            let offset = (y * Int(pixels.rowBytes)) + (x * 4)
-            let t = Double(i) / Double(totalFrames)
-            let cx = Double(x) / Double(width)
-            let cy = Double(y) / Double(height)
-            buffer[offset]     = UInt8(clamping: Int(255 * t * cx))
-            buffer[offset + 1] = UInt8(clamping: Int(128 * cy))
-            buffer[offset + 2] = UInt8(clamping: Int(255 * (1.0 - t)))
-            buffer[offset + 3] = 255
-        }
-    }
-
+    let written = writeExampleGradient(pixels, frameIndex: i, totalFrames: totalFrames)
     pixels.unlock()
+    guard written else {
+        try sender.discardFrame(frame)
+        print("Unsupported mapped layout: \(pixels.format)")
+        break
+    }
     try sender.commitFrame(frame)
 
     if i % 30 == 0 {
