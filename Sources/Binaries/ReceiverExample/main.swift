@@ -1,5 +1,6 @@
 import Foundation
 import Nozzle
+import ExamplePixels
 
 let receiver = try Receiver.create(name: "swift_sender", applicationName: "SwiftViewer")
 print("Receiver created, waiting for sender...")
@@ -14,11 +15,10 @@ for _ in 0..<iterations {
 
         let pixelInfo: String
         if let pixels = try? frame.lockPixels() {
-            let buffer = pixels.data.bindMemory(to: UInt8.self, capacity: min(4, pixels.byteCount))
-            if pixels.byteCount >= 4 {
-                pixelInfo = "rgba=\(buffer[0]),\(buffer[1]),\(buffer[2]),\(buffer[3])"
+            if let rgba = readExampleRGBA(pixels) {
+                pixelInfo = "rgba=\(rgba[0]),\(rgba[1]),\(rgba[2]),\(rgba[3])"
             } else {
-                pixelInfo = "no pixel data"
+                pixelInfo = "unsupported mapped layout: \(pixels.format)"
             }
             pixels.unlock()
         } else {

@@ -30,9 +30,13 @@ let package = Package(
                 .unsafeFlags(["-Ldeps/nozzle/build"]),
             ]
         ),
+        .target(
+            name: "ExamplePixels",
+            dependencies: ["Nozzle"]
+        ),
         .executableTarget(
             name: "SenderExample",
-            dependencies: ["Nozzle"],
+            dependencies: ["Nozzle", "ExamplePixels"],
             path: "Sources/Binaries/SenderExample",
             linkerSettings: [
                 .linkedLibrary("nozzle"),
@@ -47,7 +51,7 @@ let package = Package(
         ),
         .executableTarget(
             name: "ReceiverExample",
-            dependencies: ["Nozzle"],
+            dependencies: ["Nozzle", "ExamplePixels"],
             path: "Sources/Binaries/ReceiverExample",
             linkerSettings: [
                 .linkedLibrary("nozzle"),
@@ -62,7 +66,7 @@ let package = Package(
         ),
         .testTarget(
             name: "NozzleTests",
-            dependencies: ["Nozzle", "CNozzle"],
+            dependencies: ["Nozzle", "CNozzle", "ExamplePixels"],
             linkerSettings: [
                 .linkedLibrary("nozzle"),
                 .linkedLibrary("c++"),

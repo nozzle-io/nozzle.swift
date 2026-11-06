@@ -70,4 +70,11 @@ public final class Sender {
     public func publishNativeTexture(_ nativeTexture: UnsafeMutableRawPointer, width: UInt32, height: UInt32, format: TextureFormat) throws {
         try check(nozzle_sender_publish_native_texture(ptr, nativeTexture, width, height, format.cValue))
     }
+
+    public func discardFrame(_ frame: Frame) throws {
+        guard let fptr = frame.ptr else {
+            throw NozzleError.invalidArgument
+        }
+        try check(nozzle_sender_discard_frame(ptr, fptr))
+    }
 }
