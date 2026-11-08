@@ -14,6 +14,9 @@ final class InfoSnapshotTests: XCTestCase {
         let receiver = try Receiver.create(name: name, applicationName: "InfoSnapshotTests")
         let retained = try XCTUnwrap(receiver.connectedInfo)
         XCTAssertTrue(receiver.isConnected)
+        let initial = try XCTUnwrap(receiver.connectionSnapshot)
+        XCTAssertTrue(initial.connected)
+        XCTAssertEqual(initial.info, retained)
         XCTAssertEqual(retained.id, senderInfo.id)
         XCTAssertFalse(retained.id.isEmpty)
 
@@ -36,6 +39,11 @@ final class InfoSnapshotTests: XCTestCase {
         let connected = receiver.isConnected
         print("SWIFT_INFO_CLOSURE last_known_id=\(lastKnown.id) connected=\(connected)")
         XCTAssertFalse(connected, "observed SenderClosed must report disconnected")
+        let closed = try XCTUnwrap(receiver.connectionSnapshot)
+        XCTAssertFalse(closed.connected)
+        XCTAssertEqual(closed.info, lastKnown)
+        XCTAssertTrue(initial.connected, "retained snapshot must not change")
+        XCTAssertEqual(initial.info, retained)
     }
 
     func testMetadataRemainsOwnedAfterBothHandlesDeinitialize() throws {
@@ -48,6 +56,9 @@ final class InfoSnapshotTests: XCTestCase {
         var receiver: Receiver? = try Receiver.create(name: name, applicationName: "InfoSnapshotTests")
         weak var weakReceiver = receiver
         let receiverInfo = try XCTUnwrap(receiver?.connectedInfo)
+        let snapshot = try XCTUnwrap(receiver?.connectionSnapshot)
+        XCTAssertTrue(snapshot.connected)
+        XCTAssertEqual(snapshot.info, receiverInfo)
         XCTAssertEqual(receiverInfo.backend, .metal)
         XCTAssertEqual(sender?.info, senderInfo)
         XCTAssertEqual(receiver?.connectedInfo, receiverInfo)
@@ -64,6 +75,8 @@ final class InfoSnapshotTests: XCTestCase {
         XCTAssertEqual(receiverInfo.applicationName, application)
         XCTAssertFalse(senderInfo.id.isEmpty)
         XCTAssertEqual(receiverInfo.id, senderInfo.id)
+        XCTAssertTrue(snapshot.connected)
+        XCTAssertEqual(snapshot.info, receiverInfo)
         print("SWIFT_INFO_OWNED PASS retained UTF-8 identity after both handles deinitialized")
     }
 }

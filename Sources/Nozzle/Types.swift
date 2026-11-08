@@ -64,6 +64,13 @@ public struct ConnectedSenderInfo: Equatable {
     public var lastUpdateTimeNs: UInt64
 }
 
+/// Owned metadata and last-observed state from one native receiver snapshot.
+/// Disconnected snapshots retain last-known identity; this is not fresh liveness.
+public struct ConnectionSnapshot: Equatable {
+    public var connected: Bool
+    public var info: ConnectedSenderInfo
+}
+
 public struct FrameInfo: Equatable {
     public var frameIndex: UInt64
     public var timestampNs: UInt64
@@ -74,20 +81,37 @@ public struct FrameInfo: Equatable {
     public var droppedFrameCount: UInt32
 }
 
+// Only pass homogeneous POD CChar tuples imported from C fixed arrays.
+// Do not pass Swift arrays, strings, or whole structs (their layout differs).
+internal func snapshotString<T>(_ chars: T) -> String {
+    var tuple = chars
+    return withUnsafeBytes(of: &tuple) { bytes in
+        String(decoding: bytes.prefix { $0 != 0 }, as: UTF8.self)
+    }
+}
+
 internal extension SenderInfo {
+    // Discovery's array owns these pointers until its matching free call.
     init(_ cValue: CNozzle.NozzleSenderInfo) {
         self.name = cValue.name.flatMap { String(cString: $0) } ?? ""
         self.applicationName = cValue.application_name.flatMap { String(cString: $0) } ?? ""
         self.id = cValue.id.flatMap { String(cString: $0) } ?? ""
         self.backend = BackendType(cValue.backend)
     }
+
+    init(_ cValue: CNozzle.NozzleSenderInfoSnapshot) {
+        self.name = snapshotString(cValue.name)
+        self.applicationName = snapshotString(cValue.application_name)
+        self.id = snapshotString(cValue.id)
+        self.backend = BackendType(cValue.backend)
+    }
 }
 
 internal extension ConnectedSenderInfo {
-    init(_ cValue: CNozzle.NozzleConnectedSenderInfo) {
-        self.name = cValue.name.flatMap { String(cString: $0) } ?? ""
-        self.applicationName = cValue.application_name.flatMap { String(cString: $0) } ?? ""
-        self.id = cValue.id.flatMap { String(cString: $0) } ?? ""
+    init(_ cValue: CNozzle.NozzleConnectedSenderSnapshot) {
+        self.name = snapshotString(cValue.name)
+        self.applicationName = snapshotString(cValue.application_name)
+        self.id = snapshotString(cValue.id)
         self.backend = BackendType(cValue.backend)
         self.width = cValue.width
         self.height = cValue.height
@@ -96,6 +120,13 @@ internal extension ConnectedSenderInfo {
         self.estimatedFps = cValue.estimated_fps
         self.frameCounter = cValue.frame_counter
         self.lastUpdateTimeNs = cValue.last_update_time_ns
+    }
+}
+
+internal extension ConnectionSnapshot {
+    init(_ cValue: CNozzle.NozzleConnectedSenderSnapshot) {
+        self.connected = cValue.connected != 0
+        self.info = ConnectedSenderInfo(cValue)
     }
 }
 

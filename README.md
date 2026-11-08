@@ -104,6 +104,27 @@ let buffer = pixels.data.bindMemory(to: UInt8.self, capacity: pixels.byteCount)
 pixels.unlock()
 ```
 
+### Metadata Snapshots
+
+`sender.info` returns owned metadata. `receiver.connectionSnapshot` returns an
+optional `ConnectionSnapshot` containing `connected` and `info`, copied together
+under the native receiver lock. Imported inline C char tuples are decoded within
+their bounds into owned Swift strings; invalid UTF-8 uses replacement characters.
+The results remain valid after later calls or handle deinitialization.
+
+Connection state is last-observed, not fresh liveness or a reconnect attempt.
+After acquisition observes a disconnect, `connected` is false and `info` retains
+last-known sender identity. `connectedInfo` preserves its existing fields and
+optional error behavior by projecting the snapshot's info; a non-nil value alone
+does not imply a connection. `isConnected` reads the flag, or returns false on
+snapshot error. `sender.info` retains its empty/unknown fallback on native error.
+This adds no `Sendable` conformance or general thread-safety guarantee.
+
+Real macOS Metal tests cover same-process destruction and retained identity.
+Separate imported-struct fixtures test tuple decoding, all mapped metadata,
+fractional FPS, and wide counters; these are not native wide-value, pixel, or
+cross-process evidence.
+
 ### Discovery
 
 ```swift
@@ -156,8 +177,9 @@ try frame.copyToGLTexture(name: glTextureName, target: .texture2D, width: 1920, 
 | `Receiver.create(name:applicationName:receiveMode:)` | Create a receiver |
 | `Receiver.create(_ desc:)` | Create from descriptor |
 | `receiver.acquireFrame(timeoutMs:)` | Acquire the latest frame |
-| `receiver.isConnected` | Check if connected to a sender |
-| `receiver.connectedInfo` | Get connected sender details |
+| `receiver.isConnected` | Last-observed connection flag, false on retrieval error |
+| `receiver.connectedInfo` | Owned last-known sender details, nil on retrieval error |
+| `receiver.connectionSnapshot` | Owned coherent state and metadata, nil on retrieval error |
 
 ### `Frame`
 

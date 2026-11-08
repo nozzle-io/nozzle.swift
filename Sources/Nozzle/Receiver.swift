@@ -51,14 +51,24 @@ public final class Receiver {
         return Frame(ptr: fptr, isWritable: false)
     }
 
+    /// Owned last-known metadata, retained even after an observed disconnect.
+    /// Returns nil on native retrieval error, as before.
     public var connectedInfo: ConnectedSenderInfo? {
-        var cInfo = CNozzle.NozzleConnectedSenderInfo()
-        let result = nozzle_receiver_get_connected_info(ptr, &cInfo)
-        guard result.rawValue == 0 else { return nil }
-        return ConnectedSenderInfo(cInfo)
+        return connectionSnapshot?.info
     }
 
+    /// Copies state and metadata together under the native receiver lock.
+    /// This is last-observed state, not fresh liveness or a reconnect attempt.
+    /// The result owns its strings and survives later calls and deinitialization.
+    public var connectionSnapshot: ConnectionSnapshot? {
+        var cInfo = CNozzle.NozzleConnectedSenderSnapshot()
+        let result = nozzle_receiver_get_connected_info_snapshot(ptr, &cInfo)
+        guard result.rawValue == 0 else { return nil }
+        return ConnectionSnapshot(cInfo)
+    }
+
+    /// Last-observed connection state, or false on native retrieval error.
     public var isConnected: Bool {
-        return connectedInfo != nil
+        return connectionSnapshot?.connected ?? false
     }
 }
