@@ -42,9 +42,11 @@ public final class Sender {
         return Sender(ptr: ptr)
     }
 
+    /// Owned metadata that survives later calls and sender deinitialization.
+    /// Native errors retain the existing empty, unknown-backend fallback.
     public var info: SenderInfo {
-        var cInfo = CNozzle.NozzleSenderInfo()
-        let result = nozzle_sender_get_info(ptr, &cInfo)
+        var cInfo = CNozzle.NozzleSenderInfoSnapshot()
+        let result = nozzle_sender_get_info_snapshot(ptr, &cInfo)
         guard result.rawValue == 0 else {
             return SenderInfo(name: "", applicationName: "", id: "", backend: .unknown)
         }
